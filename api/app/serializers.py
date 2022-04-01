@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from app.models import Post
 
+from lib.constants import FieldConstants
 
 class ImageSerializer(serializers.Serializer):
 	name = serializers.CharField()
@@ -29,7 +30,8 @@ class PostSerializer(serializers.Serializer):
 	likes = serializers.IntegerField(write_only=True, required=False)
 	dislikes = serializers.IntegerField(write_only=True, required=False)
 	images = serializers.SerializerMethodField()
-	post_created = serializers.CharField(source='created', read_only=True)
+	post_created = serializers.DateTimeField(
+		source='created', format=FieldConstants.DATE_TIME_FORMAT, read_only=True)
 
 	def get_images(self, instance: Post):
 		images = ImageSerializer(instance.images.all(), many=True)

@@ -11,7 +11,7 @@ class ImageInLine(admin.TabularInline):
 	model = Image
 
 class PostAdmin(admin.ModelAdmin):
-	list_display = ("title", "description", "no_of_likes", "no_of_dislikes")
+	list_display = ("title", "description", "no_of_likes", "no_of_dislikes", "post_tags")
 	inlines = (ImageInLine, TagInLine)
 	readonly_fields = ("likes", "dislikes")
 

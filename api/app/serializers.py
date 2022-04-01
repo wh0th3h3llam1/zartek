@@ -30,6 +30,7 @@ class PostSerializer(serializers.Serializer):
 	likes = serializers.IntegerField(write_only=True, required=False)
 	dislikes = serializers.IntegerField(write_only=True, required=False)
 	images = serializers.SerializerMethodField()
+	user_choice = serializers.SerializerMethodField()
 	post_created = serializers.DateTimeField(
 		source='created', format=FieldConstants.DATE_TIME_FORMAT, read_only=True)
 
@@ -37,6 +38,15 @@ class PostSerializer(serializers.Serializer):
 		images = ImageSerializer(instance.images.all(), many=True)
 		return images.data
 	
+	def get_user_choice(self, instance: Post) -> str:
+		user = self.context.get('user')
+		choice = 'None'
+		if user in instance.liked_by.all():
+			choice = 'Liked'
+		elif user in instance.disliked_by.all():
+			choice = 'Disliked'
+		return choice
+
 
 	def validate_likes(self, likes):
 		if not self.instance:

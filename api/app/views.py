@@ -36,11 +36,12 @@ class PostViewSet(
 	def get_serializer_context(self):
 		context = super().get_serializer_context()
 		context['user'] = self.request.user
+		return context
 	
-	@action(methods=['GET',], detail=True, permission_classes=(IsAuthenticated, IsAdminUser))
+	@action(methods=['GET',], detail=True, permission_classes=(IsAuthenticated,))
 	def liked(self, request, *args, **kwargs):
 		"""
-		Admin-Only Functionality where admin can see the users that liked a particular post
+		Returns the list of users that liked a particular post
 		"""
 		
 		post = self.get_object()
@@ -84,7 +85,7 @@ class PostViewSet(
 			status=status.HTTP_200_OK
 		)
 
-	@action(methods=['patch'], detail=True)
+	@action(methods=['patch'], detail=True, permission_classes=(IsAuthenticated,))
 	def dislike(self, request, *args, **kwargs):
 		post = self.get_object()
 		context = super().get_serializer_context()

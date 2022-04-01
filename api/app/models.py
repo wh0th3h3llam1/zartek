@@ -35,6 +35,8 @@ class Post(BaseModel):
 	def no_of_dislikes(self):
 		return self.dislikes
 	
+	def post_tags(self):
+		return list(self.tags.values_list('name', flat=True))
 
 class Image(BaseModel):
 	name = models.CharField(verbose_name="Image Name", max_length=FieldConstants.MAX_LENGTH)
@@ -50,3 +52,6 @@ class Tag(BaseModel):
 	name = models.CharField(max_length=FieldConstants.MAX_LENGTH)
 	weight = models.PositiveSmallIntegerField()
 	post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='tags')
+
+	def __str__(self) -> str:
+		return f"{self.name} - {self.weight} | {self.post.title}"

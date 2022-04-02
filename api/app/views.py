@@ -1,24 +1,26 @@
+from django.contrib.auth.models import User
 from django.db.models import Sum, Q
 
-from rest_framework import status
+from rest_framework import mixins, status
 
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, ListModelMixin
 from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from app.models import Post
+from app.permissions import UserPermissions
 from app.serializers import PostSerializer
 
 # Create your views here.
 
 class PostViewSet(
-	ListModelMixin,
-	RetrieveModelMixin,
-	UpdateModelMixin,
+	mixins.ListModelMixin,
+	mixins.RetrieveModelMixin,
+	mixins.UpdateModelMixin,
+	mixins.CreateModelMixin,
 	GenericViewSet
 ):
 	"""
@@ -26,7 +28,7 @@ class PostViewSet(
 	"""
 	serializer_class = PostSerializer
 
-	permission_classes = (IsAuthenticated,)
+	permission_classes = (UserPermissions,)
 	authentication_classes = (TokenAuthentication,)
 
 	def get_queryset(self):
@@ -37,6 +39,18 @@ class PostViewSet(
 		context = super().get_serializer_context()
 		context['user'] = self.request.user
 		return context
+	
+	def create(self, request, *args, **kwargs):
+		
+		serializer = self.serializer_class(data=request.data)
+		serializer.is_valid(raise_exception=True)
+		serializer.save()
+		return Response(
+			data={
+				"message": "Created Successfully"	
+			}, status=status.HTTP_201_CREATED
+		)
+
 	
 	@action(methods=['GET',], detail=True, permission_classes=(IsAuthenticated,))
 	def liked(self, request, *args, **kwargs):
@@ -64,7 +78,7 @@ class PostViewSet(
 			context=context
 		)
 		serializer.is_valid(raise_exception=True)
-		serializer.save()
+		self.perform_update(serializer=serializer)
 
 		post_tags = post.tags.values_list('name', flat=True)
 		
@@ -85,7 +99,7 @@ class PostViewSet(
 			status=status.HTTP_200_OK
 		)
 
-	@action(methods=['patch'], detail=True, permission_classes=(IsAuthenticated,))
+	@action(methods=['PATCH'], detail=True, permission_classes=(IsAuthenticated,))
 	def dislike(self, request, *args, **kwargs):
 		post = self.get_object()
 		context = super().get_serializer_context()
@@ -119,20 +133,3 @@ class PostViewSet(
 			},
 			status=status.HTTP_200_OK
 		)
-
-class PostLikeView(APIView):
-	pass
-	
-	# similar_posts = Post.published.exclude(pk=post.pk).filter(
-	# 	tags__post=post
-	# ).annotate(
-	# 	same_tags=Count('tags')
-	# ).order_by('-same_tags','-publish')[:4]
-	# -----------------------
-
-	#     # List of similar posts
-    # post_tags_ids = post.tags.values_list('id', flat=True)
-    # similar_posts = Post.published.filter(tags__in=post_tags_ids).exclude(id=post.id)
-    # similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags','-publish')[:6]
-
-    # return render(request, 'post_detail.html',{'post':post,'comments': comments,'comment_form':comment_form,'similar_posts':similar_posts})

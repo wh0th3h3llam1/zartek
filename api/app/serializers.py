@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from app.models import Post
+from app.models import Post, Image, Tag
 
 from lib.constants import FieldConstants
 
@@ -12,13 +12,12 @@ class ImageSerializer(serializers.Serializer):
 	class Meta:
 		verbose_name = 'Image'
 		verbose_name_plural = 'Images'
+		model = Image
 
 
 	def create(self, validated_data):
+
 		return super().create(validated_data)
-	
-	def update(self, instance, validated_data):
-		return super().update(instance, validated_data)
 
 
 class PostSerializer(serializers.Serializer):
@@ -33,6 +32,9 @@ class PostSerializer(serializers.Serializer):
 	user_choice = serializers.SerializerMethodField()
 	post_created = serializers.DateTimeField(
 		source='created', format=FieldConstants.DATE_TIME_FORMAT, read_only=True)
+	post_images = serializers.ListField(write_only=True, required=False)
+	post_tags = serializers.CharField(write_only=True, required=False)
+
 
 	def get_images(self, instance: Post):
 		images = ImageSerializer(instance.images.all(), many=True)
@@ -84,6 +86,37 @@ class PostSerializer(serializers.Serializer):
 		verbose_name_plural = 'Posts'
 		model = Post
 
+
+	def create(self, validated_data):
+		post_images = validated_data.pop('post_images', None)
+		post_tags = validated_data.pop('post_tags', None)
+
+		instance = Post.objects.create(**validated_data)
+
+		if post_images:
+			images = [
+				Image(
+					name=image.name,
+					image=image,
+					post=instance
+				)
+				for image in post_images
+			]
+
+			Image.objects.bulk_create(images)
+		
+		if post_tags:
+			tags = post_tags.split(",")
+			for tag in tags:
+				name, weight = tag.split(":")
+				Tag.objects.create(
+					name=name,
+					weight=weight,
+					post=instance
+				)
+
+		
+		return instance
 	
 	def update(self, instance: Post, validated_data):
 		user = self.context.get('user')

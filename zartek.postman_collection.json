@@ -1,0 +1,258 @@
+{
+	"info": {
+		"_postman_id": "8c1fa4bb-1563-48e2-8fe3-ca93d246d357",
+		"name": "zartek",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Create Post",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Token {{TOKEN}}",
+								"type": "default"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "title",
+									"value": "Postman Post Admin 2",
+									"type": "default"
+								},
+								{
+									"key": "description",
+									"value": "Anthingajsdfgklk",
+									"type": "default"
+								},
+								{
+									"key": "post_images",
+									"type": "file",
+									"src": [
+										"/C:/Users/Root/Downloads/Album Artworks/happier-1200x1200bb.jpg",
+										"/C:/Users/Root/Downloads/Album Artworks/happier-1200x1200bb1.jpg"
+									]
+								},
+								{
+									"key": "post_tags",
+									"value": "3:2,4:3,6:1,7:4",
+									"type": "default"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{DOMAIN}}/api/v1/posts/",
+							"host": [
+								"{{DOMAIN}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"posts",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var token = JSON.parse(responseBody).token\r",
+							"pm.environment.set(\r",
+							"    \"TOKEN\", token\r",
+							")"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "username",
+							"value": "{{USERNAME}}",
+							"type": "default"
+						},
+						{
+							"key": "password",
+							"value": "{{PASSWORD}}",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{DOMAIN}}/login/",
+					"host": [
+						"{{DOMAIN}}"
+					],
+					"path": [
+						"login",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Posts",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{TOKEN}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{DOMAIN}}/api/v1/posts/",
+					"host": [
+						"{{DOMAIN}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"posts",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Like a Post",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{TOKEN}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"likes\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{DOMAIN}}/api/v1/posts/1/like/",
+					"host": [
+						"{{DOMAIN}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"posts",
+						"1",
+						"like",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dislike a Post",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{TOKEN}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"dislikes\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{DOMAIN}}/api/v1/posts/2/dislike/",
+					"host": [
+						"{{DOMAIN}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"posts",
+						"2",
+						"dislike",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Like Analysis",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Token {{TOKEN}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{DOMAIN}}/api/v1/posts/1/liked/",
+					"host": [
+						"{{DOMAIN}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"posts",
+						"1",
+						"liked",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
